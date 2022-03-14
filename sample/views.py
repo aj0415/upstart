@@ -3,10 +3,11 @@ from datetime import datetime
 import pytz
 from django.shortcuts import render
 from rest_framework import mixins, status, viewsets
+from rest_framework.renderers import TemplateHTMLRenderer
 from rest_framework.response import Response
 
 from sample.models import Event, EventResponse
-from sample.serializers import EventSerializer, EventResponseSerializer
+from sample.serializers import EventPageSerializer, EventSerializer, EventResponseSerializer
 
 
 class EventViewSet(mixins.RetrieveModelMixin, viewsets.GenericViewSet):
@@ -16,6 +17,8 @@ class EventViewSet(mixins.RetrieveModelMixin, viewsets.GenericViewSet):
     queryset = Event.objects.all()
     serializer_class = EventSerializer
     lookup_field = 'event_key'
+    render_classes = [TemplateHTMLRenderer]
+    template_name = 'event_page.html'
 
     def retrieve(self, request, *args, **kwargs):
         current_datetime = pytz.UTC.localize(datetime.utcnow())
@@ -33,7 +36,9 @@ class EventViewSet(mixins.RetrieveModelMixin, viewsets.GenericViewSet):
                 value = getattr(event, field)
                 if value:
                     data[field] = value
-            return Response(data=data, status=status.HTTP_200_OK)
+            #return Response(data=data, status=status.HTTP_200_OK)
+            serializer = EventPageSerializer(event_fields = event.event_fields.all())
+            return Response({'serializer': serializer})
         else:
             return Response(status=status.HTTP_204_NO_CONTENT)
 
