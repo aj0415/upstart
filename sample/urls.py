@@ -4,6 +4,6 @@ from sample.views import EventViewSet, EventResponseViewset
 
 router = DefaultRouter()
 router.register('event', EventViewSet)
-router.register('eventresponse', EventResponseViewsetViewSet)
+router.register('eventresponse', EventResponseViewset)
 
 urlpatterns = router.urls

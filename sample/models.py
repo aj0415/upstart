@@ -1,7 +1,6 @@
 import random
 import string
 
-from django.contrib.postgres.fields import JSONField
 from django.db import models
 
 import sample.globals as env
@@ -72,8 +71,8 @@ class Event(models.Model):
         Generate key and url for event and save
         """
         if not self.event_key:
-            self.event_key = "".join(random.choices(string.ascii_leters + string.digits, k=6))
-        self.url = "{}?event={}".format(env.EVENT_BASE_URL, str(self.event_key))
+            self.event_key = "".join(random.choices(string.ascii_letters + string.digits, k=6))
+        self.url = "{}/{}".format(env.EVENT_BASE_URL, str(self.event_key))
         super(Event, self).save(*args, **kwargs)
 
     def __str__(self):
@@ -81,6 +80,6 @@ class Event(models.Model):
 
 
 class EventResponse(models.Model):
-    data = JSONField()
+    data = models.JSONField()
     event = models.ForeignKey(Event, on_delete=models.CASCADE)
     created_at = models.DateTimeField(auto_now_add=True)

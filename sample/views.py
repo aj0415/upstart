@@ -1,5 +1,6 @@
 from datetime import datetime
 
+import pytz
 from django.shortcuts import render
 from rest_framework import mixins, status, viewsets
 from rest_framework.response import Response
@@ -43,18 +44,22 @@ class EventResponseViewset(mixins.CreateModelMixin, viewsets.GenericViewSet):
     queryset = EventResponse.objects.all()
     serializer_class = EventResponseSerializer
 
-    event_key = serializer.data['event']
+    def create(self, request, *args, **kwargs):
+        serializer = self.serializer_class(data=request.data)
+        serializer.is_valid(raise_exception=True)
 
-    try:
-        current_datetime = pytz.UTC.localize(datetime.utcnow())
-        event = Event.objects.get(
-            event_key=event_key,
-            start_date__lte=current_datetime,
-            end_date__gte=current_datetime
-        )
-        request.data['event'] = event.pk
-    except Event.DoesNotExist:
-        return Response(data={"error": "Event Not Found"}, status=status.HTTP_404_NOT_FOUND)
+        event_key = serializer.data['event']
 
-    super(EventResponseViewset, self).create(request, *args, **kwargs)
-    return Response(status=status.HTTP_201_CREATED)
+        try:
+            current_datetime = pytz.UTC.localize(datetime.utcnow())
+            event = Event.objects.get(
+                event_key=event_key,
+                start_date__lte=current_datetime,
+                end_date__gte=current_datetime
+            )
+            request.data['event'] = event.pk
+        except Event.DoesNotExist:
+            return Response(data={"error": "Event Not Found"}, status=status.HTTP_404_NOT_FOUND)
+
+        super(EventResponseViewset, self).create(request, *args, **kwargs)
+        return Response(status=status.HTTP_201_CREATED)
