@@ -49,32 +49,3 @@ class EventResponseSerializer(serializers.ModelSerializer):
         event_response.save()
 
         return event_response
-
-class EventPageSerializer(serializers.Serializer):
-    def __init__(self, *args, **kwargs):
-        event_fields = kwargs.pop('event_fields', None)
-        super(EventPageSerializer, self).__init__(*args, **kwargs)
-        for field in event_fields:
-            if field.field_type == 'NAME':
-                self.fields[field.name] = serializers.CharField(
-                    label=field.display_name,
-                    required=field.required,
-                    max_length=100
-                )
-            elif field.field_type == 'ZIP_CODE':
-                self.fields[field.name] = serializers.CharField(
-                    label=field.display_name,
-                    required=field.required,
-                    max_length=5
-                )
-            elif field.field_type == 'EMAIL':
-                self.fields[field.name] = serializers.EmailField(
-                    label=field.display_name,
-                    required=field.required,
-                    max_length=255
-                )
-            elif field.field_type == 'CHECKBOX':
-                self.fields[field.name] = serializers.BooleanField(
-                    label=field.display_name,
-                    required=field.required
-                )

@@ -72,7 +72,7 @@ class Event(models.Model):
         """
         if not self.event_key:
             self.event_key = "".join(random.choices(string.ascii_letters + string.digits, k=6))
-        self.url = "{}/{}".format(env.EVENT_BASE_URL, str(self.event_key))
+        self.url = "{}?event={}".format(env.EVENT_BASE_URL, str(self.event_key))
         super(Event, self).save(*args, **kwargs)
 
     def __str__(self):
